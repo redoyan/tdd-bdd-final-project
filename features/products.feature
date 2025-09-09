@@ -1,40 +1,111 @@
-Feature: The product store service back-end
-    As a Product Store Owner
-    I need a RESTful catalog service
-    So that I can keep track of all my products
+Feature: The product service manages products
+    As an Administrator
+    I need to be able to manage products in the catalog
+    So that I can keep the catalog up to date
 
 Background:
     Given the following products
-        | name       | description     | price   | available | category   |
-        | Hat        | A red fedora    | 59.95   | True      | CLOTHS     |
-        | Shoes      | Blue shoes      | 120.50  | False     | CLOTHS     |
-        | Big Mac    | 1/4 lb burger   | 5.99    | True      | FOOD       |
-        | Sheets     | Full bed sheets | 87.00   | True      | HOUSEWARES |
-
-Scenario: The server is running
-    When I visit the "Home Page"
-    Then I should see "Product Catalog Administration" in the title
-    And I should not see "404 Not Found"
+        | name      | category | available | price | description             |
+        | Hat       | CLOTHS   | true      | 12.50 | A red fedora            |
+        | Shoes     | CLOTHS   | false     | 25.00 | A pair of black shoes   |
+        | Big Mac   | FOOD     | true      | 5.00  | A large hamburger       |
+        | Shorts    | CLOTHS   | true      | 10.00 | A pair of blue shorts   |
 
 Scenario: Create a Product
     When I visit the "Home Page"
-    And I set the "Name" to "Hammer"
-    And I set the "Description" to "Claw hammer"
-    And I select "True" in the "Available" dropdown
-    And I select "Tools" in the "Category" dropdown
-    And I set the "Price" to "34.95"
+    And I set the "Name" to "T-Shirt"
+    And I set the "Category" to "CLOTHS"
+    And I set the "Available" to "true"
+    And I set the "Price" to "10.00"
+    And I set the "Description" to "A blue T-Shirt"
     And I press the "Create" button
+    Then I should see the message "Success"
+    And I should see "T-Shirt" in the results
+    And I should not see "Fedora" in the results
+
+Scenario: Read a Product
+    When I visit the "Home Page"
+    And I set the "Name" to "Hat"
+    And I press the "Search" button
     Then I should see the message "Success"
     When I copy the "Id" field
     And I press the "Clear" button
-    Then the "Id" field should be empty
-    And the "Name" field should be empty
-    And the "Description" field should be empty
-    When I paste the "Id" field
+    And I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see the message "Success"
-    And I should see "Hammer" in the "Name" field
-    And I should see "Claw hammer" in the "Description" field
+    And I should see "Hat" in the "Name" field
+    And I should see "A red fedora" in the "Description" field
     And I should see "True" in the "Available" dropdown
-    And I should see "Tools" in the "Category" dropdown
-    And I should see "34.95" in the "Price" field
+    And I should see "CLOTHS" in the "Category" dropdown
+    And I should see "12.50" in the "Price" field
+
+Scenario: Update a Product
+    When I visit the "Home Page"
+    And I set the "Name" to "Hat"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "A red fedora" in the "Description" field
+    When I change "Description" to "Fedora"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Fedora" in the "Description" field
+
+Scenario: Delete a Product
+    When I visit the "Home Page"
+    And I set the "Name" to "Hat"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Delete" button
+    Then I should see the message "Product has been Deleted!"
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "Hat" in the results
+
+Scenario: List all products
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Shoes" in the results
+    And I should see "Big Mac" in the results
+    And I should see "Shorts" in the results
+
+Scenario: Search by category
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "FOOD" in the "Category" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Big Mac" in the results
+    And I should not see "Hat" in the results
+    And I should not see "Shoes" in the results
+    And I should not see "Shorts" in the results
+
+Scenario: Search by available
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "True" in the "Available" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Big Mac" in the results
+    And I should not see "Shoes" in the results
+    And I should see "Shorts" in the results
+
+Scenario: Search by name
+    When I visit the "Home Page"
+    And I set the "Name" to "Hat"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the "Name" field
+    And I should see "A red fedora" in the "Description" field
